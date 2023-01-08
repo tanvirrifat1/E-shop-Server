@@ -21,8 +21,18 @@ async function run() {
         const bookingsCollection = client.db('E-shop').collection('bookings')
 
         app.get('/OrderOptions', async (req, res) => {
+            const date = req.query.date;
             const query = {};
             const options = await orderOptionCollection.find(query).toArray();
+            const bookingQuery = { orderDate: date };
+            const alreadyBooked = await bookingsCollection.find(bookingQuery).toArray();
+
+            options.forEach(option => {
+                const optionBooked = alreadyBooked.filter(book => book.product === option.name);
+                const bookingSlots = optionBooked.map(book => book.slot)
+                const remainingSlots = option.slots.filter(slot => !bookingSlots.includes(slot));
+                option.slots = remainingSlots
+            })
             res.send(options)
         })
 
