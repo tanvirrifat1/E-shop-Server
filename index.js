@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const { MongoClient, ServerApiVersion } = require('mongodb');
 require('dotenv').config()
+const jwt = require('jsonwebtoken');
+
 const port = process.env.PORT || 5000;
 
 const app = express();
@@ -19,6 +21,7 @@ async function run() {
     try {
         const orderOptionCollection = client.db('E-shop').collection('OrderOptions')
         const bookingsCollection = client.db('E-shop').collection('bookings')
+        const usersCollection = client.db('E-shop').collection('users')
 
         app.get('/OrderOptions', async (req, res) => {
             const date = req.query.date;
@@ -36,6 +39,13 @@ async function run() {
             res.send(options)
         })
 
+        app.get('/bookings', async (req, res) => {
+            const email = req.query.email;
+            const query = { email: email };
+            const booking = await bookingsCollection.find(query).toArray();
+            res.send(booking)
+        })
+
         app.post('/bookings', async (req, res) => {
             const booking = req.body;
             const query = {
@@ -43,16 +53,32 @@ async function run() {
                 email: booking.email,
                 product: booking.product
             }
-
             const alreadyBooked = await bookingsCollection.find(query).toArray();
 
             if (alreadyBooked.length) {
                 const message = `You already have a booking on ${booking.orderDate}`
                 return res.send({ acknowledged: false, message })
             }
-
-
             const result = await bookingsCollection.insertOne(booking);
+            res.send(result)
+        })
+
+        app.get('/jwt', async (req, res) => {
+            const email = req.query.email;
+            const query = { email: email };
+            const user = await usersCollection.findOne(query);
+
+            if (user) {
+                const token = jwt.sign({ email }, process.env.ACCESS_TOKEN, { expiresIn: '3d' })
+                return res.send({ accessToken: token })
+            }
+
+            res.status(403).send({ accessToken: '' })
+        })
+
+        app.post('/users', async (req, res) => {
+            const user = req.body;
+            const result = await usersCollection.insertOne(user);
             res.send(result)
         })
 
