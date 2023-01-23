@@ -37,6 +37,7 @@ async function run() {
         const orderOptionCollection = client.db('E-shop').collection('OrderOptions')
         const bookingsCollection = client.db('E-shop').collection('bookings')
         const usersCollection = client.db('E-shop').collection('users')
+        const feedbackCollection = client.db('E-shop').collection('feedback')
 
         app.get('/OrderOptions', async (req, res) => {
             const date = req.query.date;
@@ -151,6 +152,18 @@ async function run() {
             const filter = { _id: ObjectId(id) }
             const result = await usersCollection.deleteOne(filter)
             res.send(result)
+        })
+
+        app.post('/feedback', async (req, res) => {
+            const feedback = req.body;
+            const result = await feedbackCollection.insertOne(feedback);
+            res.send(result)
+        })
+
+        app.get('/feedback', async (req, res) => {
+            const query = {};
+            const feedback = await feedbackCollection.find(query).toArray();
+            res.send(feedback)
         })
 
     }
