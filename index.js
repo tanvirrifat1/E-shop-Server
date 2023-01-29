@@ -86,6 +86,14 @@ async function run() {
             res.send(result)
         })
 
+        app.delete('/bookings', async (req, res) => {
+            const id = req.params.id;
+
+            const filter = { _id: ObjectId(id) }
+            const result = await bookingsCollection.deleteOne(filter);
+            res.send(result)
+        })
+
         app.get('/jwt', async (req, res) => {
             const email = req.query.email;
             const query = { email: email };
