@@ -38,6 +38,7 @@ async function run() {
         const bookingsCollection = client.db('E-shop').collection('bookings')
         const usersCollection = client.db('E-shop').collection('users')
         const feedbackCollection = client.db('E-shop').collection('feedback')
+        const addProductCollection = client.db('E-shop').collection('addProduct')
 
         app.get('/OrderOptions', async (req, res) => {
             const date = req.query.date;
@@ -173,6 +174,19 @@ async function run() {
             const feedback = await feedbackCollection.find(query).toArray();
             res.send(feedback)
         })
+
+        app.post('/addProduct', async (req, res) => {
+            const addProduct = req.body;
+            const result = await addProductCollection.insertOne(addProduct);
+            res.send(result)
+        })
+
+        app.get('/addProduct', async (req, res) => {
+            const query = {};
+            const addProduct = await addProductCollection.findOne(query)
+            res.send(addProduct)
+        })
+
 
     }
     finally {
