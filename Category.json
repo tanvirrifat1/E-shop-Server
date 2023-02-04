@@ -1,0 +1,17 @@
+[
+    {
+        "categoryId":"1",
+        "categoryName":"Mens",
+        "image":"https://i.ibb.co/c85bvmd/people4.webp"
+    },
+    {
+        "categoryId":"2",
+        "categoryName":"Children",
+        "image":"https://i.ibb.co/47LtCQZ/little-charming-girl-dressed-checkered-shirt-jeans-stylish-cap-poses-isolated-wall-with-true-happy-e.jpg"
+    },
+    {
+        "categoryId":"3",
+        "categoryName":"Womans",
+        "image":"https://i.ibb.co/P9Jc1ND/prople6.jpg"
+    }
+]

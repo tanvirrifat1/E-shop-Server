@@ -36,9 +36,36 @@ async function run() {
     try {
         const orderOptionCollection = client.db('E-shop').collection('OrderOptions')
         const bookingsCollection = client.db('E-shop').collection('bookings')
+        const newBookingsCollection = client.db('E-shop').collection('newBookings')
         const usersCollection = client.db('E-shop').collection('users')
         const feedbackCollection = client.db('E-shop').collection('feedback')
         const addProductCollection = client.db('E-shop').collection('addProduct')
+        const CategoriesCollection = client.db('E-shop').collection('categories')
+
+        app.get('/products/category/:id', async (req, res) => {
+            const categoryId = req.params.id
+            console.log(categoryId)
+            const products = await addProductCollection.find({}).toArray()
+            const categoriesProducts = products.filter((product) => product.categoryId === categoryId)
+            res.send(categoriesProducts)
+        })
+
+        app.get('/categories', async (req, res) => {
+            const product = await CategoriesCollection.find({}).toArray()
+            res.send(product)
+        })
+
+        app.post('/order', async (req, res) => {
+            const books = req.body;
+            const result = await newBookingsCollection.insertOne(books)
+            res.send(result)
+        })
+
+        app.get('/order', async (req, res) => {
+            const query = {};
+            const newOrder = await newBookingsCollection.find(query).toArray()
+            res.send(newOrder)
+        })
 
         app.get('/OrderOptions', async (req, res) => {
             const date = req.query.date;
@@ -90,7 +117,7 @@ async function run() {
         app.delete('/bookings', async (req, res) => {
             const id = req.params.id;
 
-            const filter = { _id: ObjectId(id) }
+            const filter = { _id: new ObjectId(id) }
             const result = await bookingsCollection.deleteOne(filter);
             res.send(result)
         })
@@ -116,7 +143,7 @@ async function run() {
 
         app.get('/users/admin/:email', async (req, res) => {
             const email = req.params.email;
-            const query = { emailL: email };
+            const query = { email: email };
             const user = await usersCollection.findOne(query);
             res.send({ isAdmin: user?.role === 'admin' })
         })
@@ -137,7 +164,7 @@ async function run() {
             }
 
             const id = req.params.id;
-            const filter = { _id: ObjectId(id) }
+            const filter = { _id: new ObjectId(id) }
             const options = { upsert: true }
             const updatedDoc = {
                 $set: {
@@ -158,7 +185,7 @@ async function run() {
             }
 
             const id = req.params.id;
-            const filter = { _id: ObjectId(id) }
+            const filter = { _id: new ObjectId(id) }
             const result = await usersCollection.deleteOne(filter)
             res.send(result)
         })
@@ -179,12 +206,6 @@ async function run() {
             const addProduct = req.body;
             const result = await addProductCollection.insertOne(addProduct);
             res.send(result)
-        })
-
-        app.get('/addProduct', async (req, res) => {
-            const query = {};
-            const addProduct = await addProductCollection.findOne(query)
-            res.send(addProduct)
         })
 
 
